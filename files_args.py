@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument( "-w", "--words", help="word text file location", default="words.txt")
 parser.add_argument("folder", help="folder to scan/use", default="")
 parser.add_argument( "-o", "--output_file", help="text file to output things", default="output.txt")
-parser.add_argument( "-t", "--threads", help="number of threads to use; default is 8", default=8)
+parser.add_argument( "-t", "--threads", help="number of threads to use; default is 4", default=4)
 parser.add_argument( "-k", "--wit_key", help="your wit.ai key", default="KRNOPGHS5M2HXO3ETBTHGTUFABB62V3H")
 
 args = parser.parse_args()
