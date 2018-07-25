@@ -145,7 +145,7 @@ def save_speech(data, p):
         # dataset = [data[i:i + dur] for i in range(0, len(data), dur)]
         filenames = []
         current_time = str(time.strftime('%H%M%S'))
-        
+
         for index, item in enumerate(dataset):
             filename = current_time + '_' + str(index)
             wf = wave.open(output_folder + "/" + filename + '.wav', 'wb')
