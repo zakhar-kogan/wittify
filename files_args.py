@@ -40,9 +40,8 @@ def transcribe(data):
     idx, file = data
     name = file
     filename = re.search(r"\\(\d+)_", name).group(1)
-    print(filename + " checking\n")
-    if os.path.getsize(args.output_file) > 0:
-        with open(args.output_file, "r", encoding="utf-8") as o:
+    if os.path.getsize(args.output_file) > 10:
+        with open(args.output_file, "r+", encoding="utf-8") as o:
             json_dict = json.load(o)
         # x = re.findall(r"\[(\w+)\]", lines)
     try:
@@ -54,29 +53,12 @@ def transcribe(data):
             text = r.recognize_wit(audio, key=args.wit_key).lower()
             print ("  " + name + " finished recognizing")
             json_dict[filename] = text
-            print (json_dict[filename])
             with open(args.output_file, "w+", encoding="utf-8") as f:
                 json.dump(json_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
-                # json.dump(json_dict, f, sort_keys=True, indent=4)
-            # split_transcript.extend(text.split(" "))
+            split_transcript.extend(text.split(" "))
             print("  " + name + " done")
     except KeyboardInterrupt:
         pass
-    # if filename.split("\\")[1] not in x:
-    #     # Load audio file
-    #     with sr.AudioFile(name) as source:
-    #         audio = r.record(source)
-    #     # Transcribe audio file
-    #     text = r.recognize_wit(audio, key=args.wit_key).lower()
-    #     f.write("[{0}]: {1}\n".format(filename.split("\\")[1], text))
-    #     split_transcript.extend(text.split(" "))
-    #     print("  " + name + " done")
-    # return {
-    #         "idx": idx,
-    #         "text": text
-    #     }
-
-    
 
 # Multi-threaded synchronization
 all_text = pool.map(transcribe, enumerate(files))
@@ -86,24 +68,6 @@ pool.join()
 # total_seconds = 0
 transcript = ""
 
-# for t in sorted(all_text, key=lambda x: x['idx']):
-#         # total_seconds += int(durations[t['idx']])
-#         # Cool shortcut from:
-#         # https://stackoverflow.com/questions/775049/python-time-seconds-to-hms
-#         # to get hours, minutes and seconds
-#         # m, s = divmod(total_seconds, 60)
-#         # h, m = divmod(m, 60)
-    
-#         # Format time as h:m:s - 30 seconds of text
-#     transcript += "[{0}]: {1}\n".format(t['idx'], t['text']) + " "
-
-
-# # Non-threaded
-# for i, t in enumerate(all_text):
-#     transcript += t.lower() + " "  
-
-# split_transcript = text_array.split(" ")
-
 # Initializing the occurencies dictionary
 occurencies = {}
 
@@ -112,13 +76,11 @@ def count(what, where):
     for term in what:
         occur = where.count(term)
         if occur > 0 and term != '':
-            occurencies[term] = str(occur) + ', ' + str(round(occur/len(split_transcript)*100, 2)) + "%"
+            occurencies[term] = str(occur) + ', ' + str(round(occur/len(where)*100, 2)) + "%"
     return occurencies
 
 # Writing everything to a file
 # with open(args.output_file, "a", encoding="utf-8") as f:
-#     # f.write(transcript)
-#     # f.write("\n")
 #     final = count(terms, split_transcript)
 #     prettyprinted = dict(sorted(final.items(), key=itemgetter(1), reverse=True))
 #     f.write ("\n" + json.dumps(prettyprinted, ensure_ascii=False, indent=4))
