@@ -36,26 +36,32 @@ json_dict = {}
 string = ""
 
 def transcribe(data):
+    global json_dict
     idx, file = data
     name = file
     filename = re.search(r"\\(\d+)_", name).group(1)
-    print(filename + " checking")
+    print(filename + " checking\n")
     if os.path.getsize(args.output_file) > 0:
         with open(args.output_file, "r", encoding="utf-8") as o:
             json_dict = json.load(o)
         # x = re.findall(r"\[(\w+)\]", lines)
-    if filename not in json_dict:
-        print("  " + name + " started")
-        with sr.AudioFile(name) as source:
-            audio = r.record(source)
-        # Transcribe audio file
-        text = r.recognize_wit(audio, key=args.wit_key).lower()
-        json_dict[int(filename)] = text
-        print (json_dict)
-        with open(args.output_file, "w", encoding="utf-8") as f:
-            json.dump(json_dict, f, sort_keys=True, indent=4)
-        split_transcript.extend(text.split(" "))
-        print("  " + name + " done")
+    try:
+        if filename not in json_dict:
+            print("  " + name + " started")
+            with sr.AudioFile(name) as source:
+                audio = r.record(source)
+            # Transcribe audio file
+            text = r.recognize_wit(audio, key=args.wit_key).lower()
+            print ("  " + name + " finished recognizing")
+            json_dict[filename] = text
+            print (json_dict[filename])
+            with open(args.output_file, "w+", encoding="utf-8") as f:
+                json.dump(json_dict, f, sort_keys=True, indent=4, ensure_ascii=False)
+                # json.dump(json_dict, f, sort_keys=True, indent=4)
+            # split_transcript.extend(text.split(" "))
+            print("  " + name + " done")
+    except KeyboardInterrupt:
+        pass
     # if filename.split("\\")[1] not in x:
     #     # Load audio file
     #     with sr.AudioFile(name) as source:
@@ -65,8 +71,7 @@ def transcribe(data):
     #     f.write("[{0}]: {1}\n".format(filename.split("\\")[1], text))
     #     split_transcript.extend(text.split(" "))
     #     print("  " + name + " done")
-    #     return
-    #     {
+    # return {
     #         "idx": idx,
     #         "text": text
     #     }
