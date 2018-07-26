@@ -7,6 +7,7 @@ import urllib
 import time
 import math
 import subprocess as sub
+import threading
 
 FLAC_CONV = 'flac -f'  # We need a WAV to FLAC converter. flac is available
                        # on Linux
@@ -19,7 +20,7 @@ RATE = 16000
 THRESHOLD = 1000  # The threshold intensity that defines silence
                   # and noise signal (an int. lower than THRESHOLD is silence).
 
-SILENCE_LIMIT = 5  # Silence limit in seconds. The max amount of seconds where
+SILENCE_LIMIT = 2  # Silence limit in seconds. The max amount of seconds where
                    # only silence is recorded. When this time passes the
                    # recording finishes and the file is delivered.
 
@@ -30,9 +31,11 @@ PREV_AUDIO = 0.5  # Previous audio (in seconds) to prepend. When noise
 
 DURATION = 40     # Maximum chunk duration
 
+TIMER = 600
+
 rel = RATE/CHUNK
 
-def audio_int(num_samples=50):
+def audio_int(num_samples=30):
     """ Gets average audio intensity of your mic sound. You can use it to get
         average intensities while you're talking and/or silent. The average
         is the avg of the 20% largest intensities recorded.
@@ -59,13 +62,6 @@ def audio_int(num_samples=50):
 
 
 def listen_for_speech(threshold=THRESHOLD, num_phrases=-1):
-    """
-    Listens to Microphone, extracts phrases from it and sends it to 
-    Google's TTS service and returns response. a "phrase" is sound 
-    surrounded by silence (according to threshold). num_phrases controls
-    how many phrases to process before finishing the listening process 
-    (-1 for infinite). 
-    """
 
     # Open stream
     p = pyaudio.PyAudio()
@@ -99,15 +95,7 @@ def listen_for_speech(threshold=THRESHOLD, num_phrases=-1):
             print ("   Finished")
             # The limit was reached, finish capture and deliver.
             filename = save_speech(list(prev_audio) + audio2send, p)
-            # Send file to Google and get response
-            # r = stt_google_wav(filename) 
-            # if num_phrases == -1:
-            #     print ("Response", r)
-            # else:
-            #     response.append(r)
-            # Remove temp file. Comment line to review.
-            # os.remove(filename)
-            # Reset all
+
             started = False
             slid_win = deque(maxlen = int(SILENCE_LIMIT * rel))
             prev_audio = deque(maxlen = int(PREV_AUDIO * rel))
@@ -169,6 +157,6 @@ def save_speech(data, p):
 
 
 if(__name__ == '__main__'):
-    audio_int()  # To measure your mic levels
+    timer = threading.Timer(TIMER, audio_int())
+    timer.start()
     listen_for_speech()  # listen to mic.
-    #print stt_google_wav('hello.flac')  # translate audio file
