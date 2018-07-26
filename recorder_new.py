@@ -21,10 +21,10 @@ def callback(recognizer, audio):
 r = sr.Recognizer()
 m = sr.Microphone()
 with m as source:
+    r.dynamic_energy_threshold = True
+    r.pause_threshold = 2
     r.adjust_for_ambient_noise(source, duration=3)  # we only need to calibrate once, before we start listening
     print (r.energy_threshold)
-    r.dynamic_energy_threshold = True
-    r.pause_threshold = 3
 
 # start listening in the background (note that we don't have to do this inside a `with` statement)
 stop_listening = r.listen_in_background(m, callback, phrase_time_limit=40)
