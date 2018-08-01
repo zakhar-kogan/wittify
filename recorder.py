@@ -19,7 +19,7 @@ RATE = 16000
 THRESHOLD = 1000  # The threshold intensity that defines silence
                   # and noise signal (an int. lower than THRESHOLD is silence).
 
-SILENCE_LIMIT = 2  # Silence limit in seconds. The max amount of seconds where
+SILENCE_LIMIT = 3  # Silence limit in seconds. The max amount of seconds where
                    # only silence is recorded. When this time passes the
                    # recording finishes and the file is delivered.
 
@@ -151,20 +151,30 @@ def save_speech(data, p):
             wf = wave.open(output_folder + "/" + filename + '.wav', 'wb')
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-            wf.setframerate(RATE)  # TODO make this value a function parameter?
+            wf.setframerate(RATE) 
             wf.writeframes(item)
             filenames.append(filename)
             wf.close()
         return filenames
 
     else:
-        filename = str(time.strftime('%H%M%S'))
-        wf = wave.open(output_folder + "/" + filename + '.wav', 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-        wf.setframerate(RATE)  # TODO make this value a function parameter?
-        wf.writeframes(data)
-        wf.close()
+        if len(data) < (rel * SILENCE_LIMIT + PREV_AUDIO + 0.1):
+            print("Audio too short, likely to be noise.")
+            filename = str(time.strftime('%H%M%S'))
+            wf = wave.open(output_folder + "/" + "noise" + "/" + filename + '.wav', 'wb')
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+            wf.setframerate(RATE) 
+            wf.writeframes(data)
+            wf.close()
+        else:
+            filename = str(time.strftime('%H%M%S'))
+            wf = wave.open(output_folder + "/" + filename + '.wav', 'wb')
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+            wf.setframerate(RATE)  
+            wf.writeframes(data)
+            wf.close()
         return filename
 
 
