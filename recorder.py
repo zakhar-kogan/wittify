@@ -137,6 +137,9 @@ def save_speech(data, p):
     output_folder = str(time.strftime('%d%m%Y'))
     if os.path.exists(output_folder) == False:
             os.mkdir(output_folder)
+
+    if os.path.exists(output_folder + "/" + "noise") == False:
+            os.mkdir(output_folder + "/" + "noise")
     
     if len(data) > (rel * DURATION):
         dur = int(32768 * DURATION)
@@ -158,7 +161,7 @@ def save_speech(data, p):
         return filenames
 
     else:
-        if len(data) < (rel * SILENCE_LIMIT + PREV_AUDIO + 0.1):
+        if len(data) < (rel * SILENCE_LIMIT + PREV_AUDIO * 1.5):
             print("Audio too short, likely to be noise.")
             filename = str(time.strftime('%H%M%S'))
             wf = wave.open(output_folder + "/" + "noise" + "/" + filename + '.wav', 'wb')
