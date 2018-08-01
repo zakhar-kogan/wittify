@@ -1,3 +1,7 @@
 *.wav
 *.mp3
 *.pyc
+dist/
+build/
+recorder.build/
+*.c

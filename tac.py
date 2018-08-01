@@ -5,7 +5,8 @@ import sys
 import os.path
 import argparse
 
-# date_folder = str(time.strftime('%d%m%Y'))
+# date_automatic = str(time.strftime('%d%m%Y'))
+
 if len(sys.argv) > 1:
     date_folder = sys.argv[1]
     output = date_folder + "/" + "output.txt"
