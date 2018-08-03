@@ -1,5 +1,5 @@
 import os, sys, json, math, argparse
-import speech_recognition as sr
+import speech as sr
 from tqdm import tqdm
 from multiprocessing.dummy import Pool
 from operator import itemgetter
